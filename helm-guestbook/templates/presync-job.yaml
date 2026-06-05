@@ -1,19 +1,19 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  annotations: 
+  name: external-job
+  annotations:
     argocd.argoproj.io/hook: PreSync
     argocd.argoproj.io/hook-delete-policy: BeforeHookCreation,HookSucceeded
-  name: presync-job
 spec:
+  backoffLimit: 2
   template:
     spec:
       restartPolicy: Never
       containers:
-      - name: main
-        image: busybox
-        command: ["bash"]        
-        args:
-        - -c
-        - echo "Running database migrations..." && sleep 10 && exit 15
-  backoffLimit: 6
+        - name: migration
+          image: busybox
+          command:
+            - 'sh'
+            - '-c'
+            - "echo 'Running db migration...'; sleep 10; echo 'Done!'"
